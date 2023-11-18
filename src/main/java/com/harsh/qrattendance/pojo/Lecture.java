@@ -1,12 +1,12 @@
 package com.harsh.qrattendance.pojo;
 
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
@@ -20,7 +20,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -40,48 +39,54 @@ import lombok.ToString;
 public class Lecture {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	private String lectureid;
+	private Long lectureId;
 
-	@ManyToOne
-	@JoinColumn(name = "subjectCode")
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "subject_id")
 	private Subject subject;
 
-	@ManyToOne
-	@JoinColumn(name = "employee_id")
-	private Teacher employeeId;
+	//@ManyToOne(cascade = CascadeType.ALL)
+	//@JoinColumn(name = "teacher_id")
+	//private Teacher teacher;
 	// private String password;
 
+	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	@CreationTimestamp
 	private Instant createdOn;
 
-	@Lob
-	private byte[] qrCode;
-
 	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "listof_students")
-	private List<Student> listOfStudentattended = new ArrayList<>();
+	@JoinColumn(name = "list_of_students", nullable = true)
+	private Set<Student> listOfStudents = new HashSet<>();
 
 	// Getters and Setters
 
-	public List<Student> getListOfStudentattended() {
-		return listOfStudentattended;
+	public Long getLectureId() {
+		return lectureId;
 	}
 
-	public void setListOfStudentattended(List<Student> listOfStudentattended) {
-		this.listOfStudentattended = listOfStudentattended;
+	public void setLectureId(Long lectureId) {
+		this.lectureId = lectureId;
 	}
 
-	public Subject getSubjectCode() {
+	public Set<Student> getListOfStudents() {
+		return listOfStudents;
+	}
+
+	public void setListOfStudents(Set<Student> listOfStudents) {
+		this.listOfStudents = listOfStudents;
+	}
+
+	public Subject getSubject() {
 		return subject;
 	}
 
-	public void setSubjectCode(Subject subjectCode) {
-		this.subject = subjectCode;
+	public void setSubject(Subject subject) {
+		this.subject = subject;
 	}
 
-	public Teacher getEmployeeId() {
-		return employeeId;
-	}
+	//public Teacher getId() {
+	//	return teacher;
+	//}
 
 	public Instant getCreatedOn() {
 		return createdOn;
@@ -91,24 +96,15 @@ public class Lecture {
 		this.createdOn = createdOn;
 	}
 
-	public void setEmployeeId(Teacher employeeId) {
-		this.employeeId = employeeId;
-	}
+	//public void setId(Teacher id) {
+	//	this.teacher = id;
+	//}
 
-	public byte[] getQrCode() {
-		return qrCode;
-	}
-
-	public void setQrCode(byte[] qrCode) {
-		this.qrCode = qrCode;
-	}
-
-	public byte[] createQrCode(String lectureid) throws WriterException {
+	public static BufferedImage createQrCode(String lectureid) throws WriterException {
 		QRCodeWriter barcodeWriter = new QRCodeWriter();
 		BitMatrix bitMatrix = barcodeWriter.encode(lectureid, BarcodeFormat.QR_CODE, 200, 200);
 
-		BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
-		return ((DataBufferByte) bufferedImage.getData().getDataBuffer()).getData();
+		return MatrixToImageWriter.toBufferedImage(bitMatrix);
 	}
 
 }

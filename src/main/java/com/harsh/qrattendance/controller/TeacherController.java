@@ -1,6 +1,8 @@
 package com.harsh.qrattendance.controller;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,18 +22,18 @@ import com.harsh.qrattendance.repo.TeacherRepo;
 @RequestMapping("/api")
 public class TeacherController {
 	@Autowired
-	private TeacherRepo teacherrepo;
+	private TeacherRepo teacherRepo;
 
 	@GetMapping("/teachers")
-	public ResponseEntity<List<Teacher>> GetAllTeacher() {
+	public ResponseEntity<List<Teacher>> getAllTeacher() {
 		try {
-			List<Teacher> TeacherList = new ArrayList<>();
-			teacherrepo.findAll().forEach(TeacherList::add);
+			List<Teacher> teacherList = new ArrayList<>();
+			teacherRepo.findAll().forEach(teacherList::add);
 
-			if (TeacherList.isEmpty()) {
+			if (teacherList.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 			}
-			return new ResponseEntity<>(TeacherList, HttpStatus.OK);
+			return new ResponseEntity<>(teacherList, HttpStatus.OK);
 		} catch (Exception ex) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
@@ -39,8 +41,8 @@ public class TeacherController {
 	}
 
 	@GetMapping("/teachers/{id}")
-	public ResponseEntity<Teacher> GetTeacherByid(@PathVariable Long id) {
-		Optional<Teacher> TeacherData = teacherrepo.findById(id);
+	public ResponseEntity<Teacher> getTeacherByid(@PathVariable Long id) {
+		Optional<Teacher> TeacherData = teacherRepo.findById(id);
 
 		if (TeacherData.isPresent()) {
 			return new ResponseEntity<>(TeacherData.get(), HttpStatus.OK);
@@ -52,22 +54,22 @@ public class TeacherController {
 	@PostMapping("/teachers")
 	public ResponseEntity<Teacher> AddTeacher(@RequestBody Teacher teacher) {
 
-		Teacher teacherObj = teacherrepo.save(teacher);
+		Teacher teacherObj = teacherRepo.save(teacher);
 		return new ResponseEntity<>(teacherObj, HttpStatus.OK);
 
 	}
 
 	@PostMapping("/teachers/{id}")
 	public ResponseEntity<Teacher> UpdateTeacherById(@PathVariable Long id, @RequestBody Teacher NewTeacherData) {
-		Optional<Teacher> OldTeacherData = teacherrepo.findById(id);
+		Optional<Teacher> OldTeacherData = teacherRepo.findById(id);
 
 		if (OldTeacherData.isPresent()) {
-			Teacher UpdatedTeacherData = OldTeacherData.get();
-			UpdatedTeacherData.setFirstName(NewTeacherData.getFirstName());
-			UpdatedTeacherData.setLastName(NewTeacherData.getLastName());
-			UpdatedTeacherData.setSubject(NewTeacherData.getSubject());
-
-			Teacher teacherObj = teacherrepo.save(UpdatedTeacherData);
+			Teacher updatedTeacherData = OldTeacherData.get();
+			updatedTeacherData.setFirstName(NewTeacherData.getFirstName());
+			updatedTeacherData.setLastName(NewTeacherData.getLastName());
+			updatedTeacherData.setSubject(NewTeacherData.getSubject());
+			
+			Teacher teacherObj = teacherRepo.save(updatedTeacherData);
 			return new ResponseEntity<>(teacherObj, HttpStatus.OK);
 
 		}
@@ -78,7 +80,7 @@ public class TeacherController {
 
 	@DeleteMapping("/teachers/{id}")
 	public ResponseEntity<HttpStatus> DeleteTeacherById(@PathVariable Long id) {
-		teacherrepo.deleteById(id);
+		teacherRepo.deleteById(id);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}

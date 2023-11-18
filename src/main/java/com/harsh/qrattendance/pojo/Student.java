@@ -1,13 +1,16 @@
 package com.harsh.qrattendance.pojo;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,16 +25,26 @@ import lombok.ToString;
 @Getter
 @Setter
 @ToString
+
 public class Student {
 	@Id
-	private String enrollmentNo;
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 	private String firstName;
 	private String lastName;
 	private String email;
 	
-	@OneToMany(cascade = CascadeType.ALL)
-	@JoinColumn(name = "subjectCode")
-	private List<Subject> listOfSubjects = new ArrayList<>();
+	@ManyToMany(cascade = CascadeType.ALL)
+	@JoinTable(name = "student_subjects", joinColumns = @JoinColumn(name = "student_id"), inverseJoinColumns = @JoinColumn(name = "subjects_id"))
+	private Set<Subject> listOfSubjects = new HashSet<>();
+
+	public Set<Subject> getListOfSubjects() {
+		return listOfSubjects;
+	}
+
+	public void setListOfSubjects(Set<Subject> listOfSubject) {
+		this.listOfSubjects = listOfSubject;
+	}
 
 	public String getFirstName() {
 		return firstName;
@@ -49,12 +62,12 @@ public class Student {
 		this.lastName = lastName;
 	}
 
-	public String getEnrollmentNo() {
-		return enrollmentNo;
+	public Long getId() {
+		return id;
 	}
 
-	public void setEnrollmentNo(String enrollmentNo) {
-		this.enrollmentNo = enrollmentNo;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getEmail() {
@@ -65,12 +78,4 @@ public class Student {
 		this.email = email;
 	}
 
-	public void setListOfSubjects(List<Subject> listOfSubjects) {
-		this.listOfSubjects = listOfSubjects;
-	}
-
-	public List<Subject> getListOfSubjects() {
-
-		return listOfSubjects;
-	}
 }

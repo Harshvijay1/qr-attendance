@@ -1,14 +1,19 @@
 package com.harsh.qrattendance.pojo;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToOne;
 
 @Entity
 @Table(name="Subject")
@@ -23,25 +28,30 @@ public class Subject {
 	private String subjectCode;
 	private String subjectName;
 	
-	@OneToOne(mappedBy = "subject")
-	private Teacher teacher;
+	//@OneToOne(mappedBy = "subject")
+	//private Teacher teacher;
 	
-	public Teacher getTeacher() {
-		return teacher;
-	}
-	public void setTeacher(Teacher teacher) {
-		this.teacher = teacher;
-	}
+	@JsonIgnore
+	@ManyToMany(mappedBy = "listOfSubjects")
+	private Set<Student> listOfStudents = new HashSet<>();
+	
+//	public Teacher getTeacher() {
+	//	return teacher;
+	//}
+		
+	//public void setTeacher(Teacher teacher) {
+	//	this.teacher = teacher;
+	//}
 	public String getSubjectCode() {
 		return subjectCode;
 	}
 	public void setSubjectCode(String subjectCode) {
 		this.subjectCode = subjectCode;
 	}
-	public String getSubjectname() {
+	public String getSubjectName() {
 		return subjectName;
 	}
-	public void setSubjectname(String subjectname) {
-		subjectName = subjectname;
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
 	}
 }

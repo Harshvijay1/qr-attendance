@@ -1,8 +1,9 @@
 package com.harsh.qrattendance.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,23 +13,29 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.harsh.qrattendance.pojo.Student;
-import com.harsh.qrattendance.pojo.Teacher;
+import com.harsh.qrattendance.pojo.Subject;
 import com.harsh.qrattendance.repo.StudentRepo;
+import com.harsh.qrattendance.repo.SubjectRepo;
 
 @RestController
 @RequestMapping("/api")
 public class StudentController {
 
 	@Autowired
-	private StudentRepo studentrepo;
+	private StudentRepo studentRepo;
+
+	@Autowired
+	private SubjectRepo subjectRepo;
 
 	@GetMapping("/students")
 	public ResponseEntity<List<Student>> GetAllStudent() {
 		try {
 			List<Student> StudentList = new ArrayList<>();
-			studentrepo.findAll().forEach(StudentList::add);
+			studentRepo.findAll().forEach(StudentList::add);
 
 			if (StudentList.isEmpty()) {
 				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -42,8 +49,8 @@ public class StudentController {
 	}
 
 	@GetMapping("/students/{id}")
-	public ResponseEntity<Student> GetStudentByEnrollment(@PathVariable String enrollment) {
-		Optional<Student> StudentData = studentrepo.findById(enrollment);
+	public ResponseEntity<Student> GetStudentById(@PathVariable String id) {
+		Optional<Student> StudentData = studentRepo.findById(id);
 
 		if (StudentData.isPresent()) {
 			return new ResponseEntity<>(StudentData.get(), HttpStatus.OK);
@@ -55,36 +62,46 @@ public class StudentController {
 	@PostMapping("/students")
 	public ResponseEntity<Student> AddStudent(@RequestBody Student student) {
 
-		Student studentObj = studentrepo.save(student);
+		Student studentObj = studentRepo.save(student);
 		return new ResponseEntity<>(studentObj, HttpStatus.OK);
 
 	}
 
-	@PostMapping("/students/{enrollment}")
-	public ResponseEntity<Student> UpdateStudentByEnrollment(@PathVariable String enrollment,
+	@PostMapping("/students/{id}")
+	public ResponseEntity<Student> UpdateStudentById(@PathVariable String id,
 			@RequestBody Student NewStudentData) {
-		Optional<Student> OldStudentData = studentrepo.findById(enrollment);
+		Optional<Student> OldStudentData = studentRepo.findById(id);
 
 		if (OldStudentData.isPresent()) {
 			Student UpdatedStudentData = OldStudentData.get();
 			UpdatedStudentData.setFirstName(NewStudentData.getFirstName());
 			UpdatedStudentData.setLastName(NewStudentData.getLastName());
 			UpdatedStudentData.setEmail(NewStudentData.getEmail());
-			UpdatedStudentData.setListOfSubjects(NewStudentData.getListOfSubjects());
+			// UpdatedStudentData.setListOfSubjects(NewStudentData.getListOfSubjects());
 
-			Student studentObj = studentrepo.save(UpdatedStudentData);
+			Student studentObj = studentRepo.save(UpdatedStudentData);
 			return new ResponseEntity<>(studentObj, HttpStatus.OK);
 
 		}
 		return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 
 	}
-	
-	@DeleteMapping("students/{enrollment}")
-	public ResponseEntity<HttpStatus> DeleteStudentByEnrollemnt(@PathVariable String enrollment) {
-		studentrepo.deleteById(enrollment);
+
+	@DeleteMapping("students/{id}")
+	public ResponseEntity<HttpStatus> DeleteStudentById(@PathVariable String Id) {
+		studentRepo.deleteById(Id);
 		return new ResponseEntity<>(HttpStatus.OK);
 
 	}
-
+	
+	@PostMapping("students/{id}/subjects/{subjectCode}")
+	public ResponseEntity<Student> assignedSubjectToStudent(@PathVariable String id, @PathVariable String subjectCode) {
+		Set<Subject> SubjectSet = null;
+		Student student = studentRepo.findById(id).get();
+		Subject subject = subjectRepo.findById(id).get();
+		SubjectSet = student.getListOfSubjects();
+		SubjectSet.add(subject);
+		student.setListOfSubjects(SubjectSet);
+		return new ResponseEntity<>(student,HttpStatus.OK);
+	}
 }

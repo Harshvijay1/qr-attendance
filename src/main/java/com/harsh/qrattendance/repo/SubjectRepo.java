@@ -3,9 +3,9 @@ package com.harsh.qrattendance.repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.harsh.qrattendance.pojo.Lecture;
+import com.harsh.qrattendance.pojo.Subject;
 
 @Repository
-public interface LectureRepo extends JpaRepository<Lecture, String> {
+public interface SubjectRepo extends JpaRepository<Subject,String> {
 
 }

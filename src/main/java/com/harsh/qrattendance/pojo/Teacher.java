@@ -30,7 +30,7 @@ public class Teacher {
 	private String lastName;
 	// private String password;
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "subjectCode") 
+	@JoinColumn(name = "fk_subject") 
 	private Subject subject;
 	
 	public String getLastName() {
@@ -50,6 +50,12 @@ public class Teacher {
 	}
 	public void setSubject(Subject subject) {
 		this.subject = subject;
+	}
+	public Long getId() {
+		return id;
+	}
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	}

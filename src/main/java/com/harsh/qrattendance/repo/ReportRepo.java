@@ -1,5 +1,5 @@
 package com.harsh.qrattendance.repo;
 
-public class ReportRepo {
+public interface ReportRepo  {
 
 }
